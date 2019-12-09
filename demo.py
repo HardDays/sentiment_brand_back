@@ -24,9 +24,10 @@ with open(cls_name, 'rb') as cls_fp:
         
 se = SentimentAnalyzer(cls=cls)
 
+crawler = Crawler(divide_by_sentences='own')
 
-@app.route('/analyze', methods=['POST', 'OPTIONS'])
-def analyze(): 
+@app.route('/analyze/content', methods=['POST', 'OPTIONS'])
+def analyze_content(): 
     if request.method == 'POST':
         data = request.get_json()
         if 'name' in data and 'is_person' in data and 'content' in data:
@@ -47,9 +48,30 @@ def analyze():
         else:
             return jsonify({'status': 'NO_PARAMETERS'}), 422
             
+@app.route('/analyze/url', methods=['POST', 'OPTIONS'])
+def analyze_url(): 
+    if request.method == 'POST':
+        data = request.get_json()
+        if 'name' in data and 'is_person' in data and 'url' in data:
+            content = crawler.load_and_tokenize([data['url']], depth=1)   
+            filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
+            result = se.analyze(collections.OrderedDict(filtered))
+            if len(result) == 3:
+                return jsonify(
+                    {
+                        'total': sum(result),
+                        'negative': result[0],
+                        'neutral': result[1],
+                        'positive': result[2]
+                    }
+                )
+            else:
+                return jsonify({'status': 'NOT_CALCULATED'}), 422
+        else:
+            return jsonify({'status': 'NO_PARAMETERS'}), 422
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=3000)
+    app.run(debug=True, host='0.0.0.0', port=3002)
 
 
 # if __name__ == '__main__':
