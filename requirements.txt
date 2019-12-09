@@ -5,7 +5,6 @@ spacy
 pymorphy2
 nltk
 sklearn
-numpy-mkl
 flask
 flask_cors
 https://github.com/Theano/Theano/archive/master.zip
