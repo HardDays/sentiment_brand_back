@@ -70,7 +70,10 @@ def analyze_url():
     if request.method == 'POST':
         data = request.get_json()
         if 'name' in data and 'is_person' in data and 'url' in data:
-            content = crawler.load_and_tokenize([data['url']], depth=3)   
+            depth = 3
+            if 'depth' in data:
+                depth = int(data['depth'])
+            content = crawler.load_and_tokenize([data['url']], depth=depth)   
             filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
             if len(filtered) > 0:
                 result = se.analyze(filtered)
@@ -132,7 +135,7 @@ if __name__ == '__main__':
 #         print('  {0}'.format(it))
 #     print('')
 #     crawler = Crawler(divide_by_sentences=use_spacy_for_sentiment_analysis)
-#     full_content = crawler.load_and_tokenize(urls, depth=1)   
+#     full_content = crawler.load_and_tokenize(urls, depth=3)   
 #     if len(full_content) == 0:
 #         print('По заданным веб-ссылкам ничего не написано :-(')
 #     else:
