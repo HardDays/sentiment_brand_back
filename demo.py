@@ -33,6 +33,7 @@ def analyze_content():
         if 'name' in data and 'is_person' in data and 'content' in data:
             prep_data = data['content'].split('.')
             filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content={'1': prep_data})
+            #return jsonify(filtered)
             if len(filtered) > 0:
                 result = se.analyze(collections.OrderedDict(filtered))
                 if len(result) == 3:

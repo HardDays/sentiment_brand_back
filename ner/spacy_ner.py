@@ -41,6 +41,12 @@ class SpacyNamedEntityRecognizer(object):
         :return тот же самый словарь, что и web_content, только отфильтрованный.
 
         """
+        trivial = {}
+        for url in web_content.keys():
+            trivial[url] = []
+            for sent in web_content[url]:
+                if who in sent:
+                    trivial[url].append(sent)
         nlp = spacy.load('xx_ent_wiki_sm', disable=['parser', 'tagger'])
         morph = pymorphy2.MorphAnalyzer()
         for url in list(web_content.keys()):
@@ -71,4 +77,12 @@ class SpacyNamedEntityRecognizer(object):
             web_content[url] = copy.copy(filtered_content)
             if url_fl == 0:
                 del web_content[url]
+        
+        for url in trivial.keys():
+            if url in web_content:
+                for sent in trivial[url]:
+                    if not sent in web_content[url]:
+                        web_content[url].append(sent)
+            else:
+                web_content[url] = trivial[url]
         return web_content
