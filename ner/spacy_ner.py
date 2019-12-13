@@ -45,7 +45,7 @@ class SpacyNamedEntityRecognizer(object):
         for url in web_content.keys():
             trivial[url] = []
             for sent in web_content[url]:
-                if who in sent:
+                if who.lower() in sent.lower():
                     trivial[url].append(sent)
         nlp = spacy.load('xx_ent_wiki_sm', disable=['parser', 'tagger'])
         morph = pymorphy2.MorphAnalyzer()
