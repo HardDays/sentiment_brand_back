@@ -16,6 +16,8 @@ app = Flask(__name__)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
+crawler = Crawler(divide_by_sentences=False)
+
 ner = SpacyNamedEntityRecognizer()
 
 cls_name = os.path.join('data', 'senti_cnn_classifier.pkl')
@@ -24,7 +26,6 @@ with open(cls_name, 'rb') as cls_fp:
         
 se = SentimentAnalyzer(cls=cls)
 
-crawler = Crawler(divide_by_sentences=False)
 
 @app.route('/analyze/content', methods=['POST', 'OPTIONS'])
 def analyze_content(): 

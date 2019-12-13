@@ -83,6 +83,6 @@ class SpacyNamedEntityRecognizer(object):
                 for sent in trivial[url]:
                     if not sent in web_content[url]:
                         web_content[url].append(sent)
-            else:
+            elif len(trivial[url]) > 0:
                 web_content[url] = trivial[url]
         return web_content
