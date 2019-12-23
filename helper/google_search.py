@@ -16,6 +16,7 @@ class GoogleSearch:
                 res = self.service.cse().list(q=sites, start=start, cx=self.cx).execute()
                 for link in res['items']:
                     links.append(link['link'])
+                start += 10
             return links
         except Exception as ex:
             print(ex)

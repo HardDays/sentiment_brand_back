@@ -92,8 +92,12 @@ def analyze_social():
     if request.method == 'POST':
         data = request.get_json()
         if 'name' in data and 'is_person' in data:
+            depth = 1
             if 'depth' in data:
                 depth = int(data['depth'])
+            pages = 5
+            if 'pages' in data:
+                pages = min(1, int(data['pages']), 20)
             
             links = google.search(data['name'])
             if len(links) > 0:
