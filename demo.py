@@ -60,6 +60,7 @@ def check(filtered):
 def analyze_content(): 
     if request.method == 'POST':
         data = request.get_json()
+        print(data)
         if 'name' in data and 'is_person' in data and 'content' in data:
             prep_data = data['content'].split('.')
             filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content={'text': prep_data})
@@ -72,6 +73,7 @@ def analyze_content():
 def analyze_url(): 
     if request.method == 'POST':
         data = request.get_json()
+        print(data)
         if 'name' in data and 'is_person' in data and 'url' in data:
             depth = 3
             if 'depth' in data:
