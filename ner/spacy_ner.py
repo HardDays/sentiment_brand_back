@@ -85,4 +85,8 @@ class SpacyNamedEntityRecognizer(object):
                         web_content[url].append(sent)
             elif len(trivial[url]) > 0:
                 web_content[url] = trivial[url]
+
+        for i in web_content:
+            web_content[i] = list(set(web_content[i]))
+
         return web_content
