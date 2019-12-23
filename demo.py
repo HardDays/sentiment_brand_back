@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 
 from crawler.crawler import Crawler
+from helper.google_search import GoogleSearch
 from ner.spacy_ner import SpacyNamedEntityRecognizer
 from sentiment_analyzer.sentiment_analyzer import SentimentAnalyzer
 from flask import Flask, Response, request, jsonify
@@ -15,6 +16,8 @@ import pickle
 app = Flask(__name__)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+
+google = GoogleSearch(os.environ['GOOGLE_SEARCH_KEY'], os.environ['GOOGLE_SEARCH_CX'])
 
 crawler = Crawler(divide_by_sentences=False)
 
@@ -91,11 +94,14 @@ def analyze_social():
         if 'name' in data and 'is_person' in data:
             if 'depth' in data:
                 depth = int(data['depth'])
-            social = ['https://go.mail.ru/search_social?q=' + data['name']]
-            print(social)
-            content = crawler.load_and_tokenize(social, depth=depth)   
-            filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
-            return check(filtered)
+            
+            links = google.search(data['name'])
+            if len(links) > 0:
+                content = crawler.load_and_tokenize(links, depth=depth)   
+                filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
+                return check(filtered)
+            else:
+                return empty()
         else:
             return jsonify({'status': 'NO_PARAMETERS'}), 422
 
