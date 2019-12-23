@@ -62,7 +62,7 @@ def analyze_content():
         data = request.get_json()
         if 'name' in data and 'is_person' in data and 'content' in data:
             prep_data = data['content'].split('.')
-            filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content={'1': prep_data})
+            filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content={'text': prep_data})
             filtered = collections.OrderedDict(filtered)
             return check(filtered)
         else:
@@ -81,6 +81,21 @@ def analyze_url():
             return check(filtered)
         else:
             return jsonify({'status': 'NO_PARAMETERS'}), 422
+
+@app.route('/analyze/social', methods=['POST', 'OPTIONS'])
+def analyze_social(): 
+    if request.method == 'POST':
+        data = request.get_json()
+        if 'name' in data and 'is_person' in data:
+            if 'depth' in data:
+                depth = int(data['depth'])
+            social = ['https://go.mail.ru/search_social?q=' + data['name']]
+            content = crawler.load_and_tokenize([social], depth=depth)   
+            filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
+            return check(filtered)
+        else:
+            return jsonify({'status': 'NO_PARAMETERS'}), 422
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=3002)
