@@ -90,7 +90,7 @@ def analyze_social():
             if 'depth' in data:
                 depth = int(data['depth'])
             social = ['https://go.mail.ru/search_social?q=' + data['name']]
-            content = crawler.load_and_tokenize([social], depth=depth)   
+            content = crawler.load_and_tokenize(social, depth=depth)   
             filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
             return check(filtered)
         else:
