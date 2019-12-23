@@ -99,7 +99,7 @@ def analyze_social():
             if 'pages' in data:
                 pages = min(1, int(data['pages']), 20)
             
-            links = google.search(data['name'])
+            links = google.search(data['name'], pages=pages)
             if len(links) > 0:
                 content = crawler.load_and_tokenize(links, depth=depth)   
                 filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
