@@ -27,6 +27,35 @@ with open(cls_name, 'rb') as cls_fp:
 se = SentimentAnalyzer(cls=cls)
 
 
+def empty():
+    return jsonify(
+        {
+            'total': 0,
+            'negative': 0,
+            'neutral': 0,
+            'positive': 0,
+            'mentions': []
+        }
+    )
+
+def check(filtered):
+    if len(filtered) > 0:
+        result = se.analyze(filtered)
+        if len(result) == 3:
+            return jsonify(
+                {
+                    'total': sum(result),
+                    'negative': result[0],
+                    'neutral': result[1],
+                    'positive': result[2],
+                    'mentions': filtered
+                }
+            )
+        else:
+            return empty()
+    else:
+        return empty()
+
 @app.route('/analyze/content', methods=['POST', 'OPTIONS'])
 def analyze_content(): 
     if request.method == 'POST':
@@ -34,36 +63,8 @@ def analyze_content():
         if 'name' in data and 'is_person' in data and 'content' in data:
             prep_data = data['content'].split('.')
             filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content={'1': prep_data})
-            #return jsonify(filtered)
-            if len(filtered) > 0:
-                result = se.analyze(collections.OrderedDict(filtered))
-                if len(result) == 3:
-                    return jsonify(
-                        {
-                            'total': sum(result),
-                            'negative': result[0],
-                            'neutral': result[1],
-                            'positive': result[2]
-                        }
-                    )
-                else:
-                    return jsonify(
-                        {
-                            'total': 0,
-                            'negative': 0,
-                            'neutral': 0,
-                            'positive': 0
-                        }
-                    )
-            else:
-                return jsonify(
-                    {
-                        'total': 0,
-                        'negative': 0,
-                        'neutral': 0,
-                        'positive': 0
-                    }
-                )
+            filtered = collections.OrderedDict(filtered)
+            return check(filtered)
         else:
             return jsonify({'status': 'NO_PARAMETERS'}), 422
             
@@ -77,35 +78,7 @@ def analyze_url():
                 depth = int(data['depth'])
             content = crawler.load_and_tokenize([data['url']], depth=depth)   
             filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
-            if len(filtered) > 0:
-                result = se.analyze(filtered)
-                if len(result) == 3:
-                    return jsonify(
-                        {
-                            'total': sum(result),
-                            'negative': result[0],
-                            'neutral': result[1],
-                            'positive': result[2]
-                        }
-                    )
-                else:
-                    return jsonify(
-                        {
-                            'total': 0,
-                            'negative': 0,
-                            'neutral': 0,
-                            'positive': 0
-                        }
-                    )
-            else:
-                return jsonify(
-                    {
-                        'total': 0,
-                        'negative': 0,
-                        'neutral': 0,
-                        'positive': 0
-                    }
-                )
+            return check(filtered)
         else:
             return jsonify({'status': 'NO_PARAMETERS'}), 422
 
