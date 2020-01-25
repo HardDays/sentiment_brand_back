@@ -53,8 +53,8 @@ def check(filtered, dates={}):
                     'negative': result[0],
                     'neutral': result[1],
                     'positive': result[2],
-                    'mentions': filtered,
-                    'dates': dates
+                    'mentions': filtered
+                    #'dates': dates
                 }
             )
         else:
