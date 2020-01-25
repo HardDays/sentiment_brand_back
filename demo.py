@@ -112,9 +112,9 @@ def analyze_social():
                 filter_name = data['filter_name']
             
             links = google.search(data['name'], pages=pages)
-            if len(links) > 0:
+            if len(links[0]) > 0:
                 content = crawler.load_and_tokenize(links[0], depth=depth)   
-                filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content, filter_name='full')
+                filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content, filter_name=filter_name)
                 
                 return check(filtered, links[1])
             else:

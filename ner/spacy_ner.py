@@ -10,7 +10,7 @@ class SpacyNamedEntityRecognizer(object):
     def __init__(self):
         pass
 
-    def filter_content(self, who: str, is_person: bool, web_content: OrderedDict, filter_name='full') -> OrderedDict:
+    def filter_content(self, who: str, is_person: bool, web_content: OrderedDict, filter_name='any') -> OrderedDict:
         """ Отфильтровать входной веб-контент, удалив из него абзацы, где нет упоминаний о нужных нам людях или фирмах.
 
         Входной веб-контент представляет собой словарь, ключами которого являются строковые описания ранее пропарсенных
@@ -82,7 +82,7 @@ class SpacyNamedEntityRecognizer(object):
                                 if morph.parse(ent.text.lower())[0].normal_form == morph.parse(who.lower())[0].normal_form:
                                     doc_fl += 1
                                     url_fl += 1
-                                    
+
                 if filter_name == 'all' and all(name_tokens[i] > 0 for i in name_tokens):
                     doc_fl += sum(name_tokens[i] for i in name_tokens)
                     url_fl += sum(name_tokens[i] for i in name_tokens)
