@@ -13,8 +13,6 @@ import os
 import collections
 import pickle
 
-crawler = Crawler(divide_by_sentences=False)
-ner = SpacyNamedEntityRecognizer()
 
 app = Flask(__name__)
 CORS(app)
@@ -53,8 +51,8 @@ def check(filtered, dates={}):
                     'negative': result[0],
                     'neutral': result[1],
                     'positive': result[2],
-                    'mentions': filtered
-                    #'dates': dates
+                    'mentions': filtered,
+                    'dates': dates
                 }
             )
         else:

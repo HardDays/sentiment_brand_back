@@ -24,9 +24,9 @@ class GoogleSearch:
                                 date = link['pagemap'][dt][0][date_tokens[dt]][:10]
                     except Exception:
                         pass
-                    links.append(link)
+                    links.append(link['link'])
                     if date:
-                        dates[link] = date
+                        dates[link['link']] = date
                 start += 10
             return links, dates
         except Exception as ex:
