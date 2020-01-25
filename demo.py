@@ -67,7 +67,7 @@ def analyze_content():
         print(data)
         if 'name' in data and 'is_person' in data and 'content' in data:
             filter_name = 'any'
-            if 'fitler_name' in data:
+            if 'filter_name' in data:
                 filter_name = data['filter_name']
 
             prep_data = data['content'].split('.')
@@ -87,7 +87,7 @@ def analyze_url():
             if 'depth' in data:
                 depth = int(data['depth'])
             filter_name = 'any'
-            if 'fitler_name' in data:
+            if 'filter_name' in data:
                 filter_name = data['filter_name']
                 
             content = crawler.load_and_tokenize([data['url']], depth=depth)   
@@ -108,7 +108,7 @@ def analyze_social():
             if 'pages' in data:
                 pages = min(1, int(data['pages']), 20)
             filter_name = 'any'
-            if 'fitler_name' in data:
+            if 'filter_name' in data:
                 filter_name = data['filter_name']
             
             links = google.search(data['name'], pages=pages)
