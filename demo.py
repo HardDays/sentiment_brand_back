@@ -13,6 +13,9 @@ import os
 import collections
 import pickle
 
+crawler = Crawler(divide_by_sentences=False)
+ner = SpacyNamedEntityRecognizer()
+
 app = Flask(__name__)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -29,7 +32,6 @@ with open(cls_name, 'rb') as cls_fp:
         
 se = SentimentAnalyzer(cls=cls)
 
-
 def empty():
     return jsonify(
         {
@@ -41,7 +43,7 @@ def empty():
         }
     )
 
-def check(filtered):
+def check(filtered, dates={}):
     if len(filtered) > 0:
         result = se.analyze(filtered)
         if len(result) == 3:
@@ -51,7 +53,8 @@ def check(filtered):
                     'negative': result[0],
                     'neutral': result[1],
                     'positive': result[2],
-                    'mentions': filtered
+                    'mentions': filtered,
+                    'dates': dates
                 }
             )
         else:
@@ -65,8 +68,12 @@ def analyze_content():
         data = request.get_json()
         print(data)
         if 'name' in data and 'is_person' in data and 'content' in data:
+            filter_name = 'any'
+            if 'fitler_name' in data:
+                filter_name = data['filter_name']
+
             prep_data = data['content'].split('.')
-            filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content={'text': prep_data})
+            filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content={'text': prep_data}, filter_name=filter_name)
             filtered = collections.OrderedDict(filtered)
             return check(filtered)
         else:
@@ -81,8 +88,12 @@ def analyze_url():
             depth = 3
             if 'depth' in data:
                 depth = int(data['depth'])
+            filter_name = 'any'
+            if 'fitler_name' in data:
+                filter_name = data['filter_name']
+                
             content = crawler.load_and_tokenize([data['url']], depth=depth)   
-            filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
+            filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content, filter_name=filter_name)
             return check(filtered)
         else:
             return jsonify({'status': 'NO_PARAMETERS'}), 422
@@ -98,12 +109,16 @@ def analyze_social():
             pages = 5
             if 'pages' in data:
                 pages = min(1, int(data['pages']), 20)
+            filter_name = 'any'
+            if 'fitler_name' in data:
+                filter_name = data['filter_name']
             
             links = google.search(data['name'], pages=pages)
             if len(links) > 0:
-                content = crawler.load_and_tokenize(links, depth=depth)   
-                filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content)
-                return check(filtered)
+                content = crawler.load_and_tokenize(links[0], depth=depth)   
+                filtered = ner.filter_content(who=data['name'], is_person=data['is_person'], web_content=content, filter_name=filter_name)
+                
+                return check(filtered, links[1])
             else:
                 return empty()
         else:
